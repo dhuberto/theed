@@ -2,7 +2,7 @@
 FROM node:18-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --only=production && npm cache clean --force
 
 # Estágio final – imagem de produção
 FROM node:18-alpine
