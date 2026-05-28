@@ -10,16 +10,14 @@ Projetada com **melhores práticas de DevOps**:
 - Pronto para produção
 
 theed/
-├── .env                      # (NÃO versionado) – credenciais reais
-├── .env.example              # (versionado) – modelo
+├── .env.example          # modelo de variáveis
 ├── .gitignore
-├── .dockerignore
-├── Dockerfile                # multi‑stage
-├── compose.yml               # orquestração (nome moderno)
+├── Dockerfile            # multi‑stage
+├── compose.yml
 ├── package.json
 ├── README.md
 └── src/
-    └── index.js              # aplicação completa (front+back)
+    └── index.js          # frontend + backend (formulário e API)
 
 ## 📦 Pré‑requisitos
 
