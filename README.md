@@ -2,7 +2,7 @@
 
  Sobre o Projeto
 
-**Theed** é uma aplicação web de exemplo, criada para demonstrar como construir e containerizar uma aplicação Node.js com um banco de dados PostgreSQL utilizando Docker.
+**Theed** é uma aplicação web de exemplo, criada para demonstrar como construir e containerizar uma aplicação com o Dockerfile e o compose.yaml com o Node.js e banco de dados PostgreSQL utilizando Docker.
 
 Ela permite que os usuários:
 *   Cadastrem nomes via um formulário web simples.
