@@ -1,5 +1,26 @@
 # Theed – Cadastro de Nomes com Node.js + PostgreSQL (Docker)
 
+ Sobre o Projeto
+
+**Theed** é uma aplicação web de exemplo, criada para demonstrar como construir e containerizar uma aplicação Node.js com um banco de dados PostgreSQL utilizando Docker.
+
+Ela permite que os usuários:
+*   Cadastrem nomes via um formulário web simples.
+*   Visualizem em tempo real a lista de nomes salvos no banco de dados.
+
+## Tecnologias e Boas Práticas
+
+*   **Node.js & Express:** Backend da aplicação.
+*   **Sequelize (ORM):** Interação com o banco de dados de forma segura e eficiente.
+*   **PostgreSQL:** Banco de dados relacional robusto.
+*   **Docker:**
+    *   **Dockerfile Multi-stage:** Gera uma imagem de produção pequena e eficiente.
+    *   **Docker Compose:** Orquestra os serviços da aplicação (app e banco).
+    *   **.dockerignore:** Otimiza o build ao ignorar arquivos desnecessários.
+*   **Segurança:**
+    *   **Variáveis de Ambiente (.env):** Arquivo não versionado para credenciais.
+    *   **.env.example:** Modelo de configuração para novos desenvolvedores.
+
 Aplicação web simples que permite adicionar nomes em um banco PostgreSQL e visualizar a lista atualizada.  
 Projetada com **melhores práticas de DevOps**:
 
