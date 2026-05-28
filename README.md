@@ -1,4 +1,4 @@
-# 🌆 Theed – Cadastro de Nomes com Node.js + PostgreSQL (Docker)
+# Theed – Cadastro de Nomes com Node.js + PostgreSQL (Docker)
 
 Aplicação web simples que permite adicionar nomes em um banco PostgreSQL e visualizar a lista atualizada.  
 Projetada com **melhores práticas de DevOps**:
@@ -19,7 +19,7 @@ theed/
 └── src/	
     └── index.js          # frontend + backend (formulário e API)	
 	
-## 📦 Pré‑requisitos
+## Pré‑requisitos
 
 1. Pré‑requisitos no seu Linux (Ubuntu)
 
@@ -40,7 +40,7 @@ sudo usermod -aG docker $USER
 - Git
 
 
-## 🚀 Como executar (qualquer Linux)
+# Como executar (qualquer Linux)
 
 ```bash
 git clone https://github.com/dhuberto/theed.git
