@@ -9,16 +9,16 @@ Projetada com **melhores práticas de DevOps**:
 - `compose.yml` moderno
 - Pronto para produção
 
-theed/
-├── .env.example          # modelo de variáveis
-├── .gitignore
-├── Dockerfile            # multi‑stage
-├── compose.yml
-├── package.json
-├── README.md
-└── src/
-    └── index.js          # frontend + backend (formulário e API)
-
+theed/	
+├── .env.example          # modelo de variáveis	
+├── .gitignore	
+├── Dockerfile            # multi‑stage	
+├── compose.yml	
+├── package.json	
+├── README.md	
+└── src/	
+    └── index.js          # frontend + backend (formulário e API)	
+	
 ## 📦 Pré‑requisitos
 
 1. Pré‑requisitos no seu Linux (Ubuntu)
