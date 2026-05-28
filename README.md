@@ -11,11 +11,17 @@ Projetada com **melhores práticas de DevOps**:
 
 theed/	
 ├── .env.example          # modelo de variáveis	
+
 ├── .gitignore	
+
 ├── Dockerfile            # multi‑stage	
+
 ├── compose.yml	
+
 ├── package.json	
+
 ├── README.md	
+
 └── src/	
     └── index.js          # frontend + backend (formulário e API)	
 	
@@ -31,7 +37,9 @@ docker compose version
 #Se não tiver, instale:
 
 sudo apt update
+
 sudo apt install docker.io docker-compose-v2
+
 sudo usermod -aG docker $USER
 
 # reinicie o terminal ou faça logout/login
