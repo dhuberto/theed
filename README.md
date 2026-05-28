@@ -35,20 +35,16 @@ theed/
 
 # Verifique se tem Docker e Docker Compose
 docker --version
+
 docker compose version
 
-#Se não tiver, instale:
+#Se não tiver, instale e adicione seu usuario ao grupo docker:
 
 sudo apt update
 
 sudo apt install docker.io docker-compose-v2
 
 sudo usermod -aG docker $USER
-
-# reinicie o terminal ou faça logout/login
-
-- Docker e Docker Compose (v2+)
-- Git
 
 
 # Como executar (qualquer Linux)
