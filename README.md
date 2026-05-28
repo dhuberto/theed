@@ -10,6 +10,7 @@ Projetada com **melhores práticas de DevOps**:
 - Pronto para produção
 
 theed/	
+
 ├── .env.example          # modelo de variáveis	
 
 ├── .gitignore	
@@ -22,7 +23,8 @@ theed/
 
 ├── README.md	
 
-└── src/	
+└── src/
+
     └── index.js          # frontend + backend (formulário e API)	
 	
 ## Pré‑requisitos
