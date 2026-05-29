@@ -67,16 +67,14 @@ Se não tiver o Docker instalado, execute os comandos abaixo no seu terminal:
 
  - Atualize o índice de pacotes da distribuição
  
-> Bash
-> sudo apt update
+> `sudo apt update`
 - Instale o motor do Docker e o plugin nativo do Docker Compose
 
-> Bash
-> sudo apt install docker.io docker-compose-v2 -y
+> `sudo apt install docker.io docker-compose-v2 -y`
+
 - Adicione seu usuário ao grupo do sistema docker para evitar a obrigatoriedade do 'sudo'
 
-> Bash
-> sudo usermod -aG docker $USER 
+> `sudo usermod -aG docker $USER`
 
 ⚠️ **Nota Importante:** Após rodar o comando `usermod`, encerre sua sessão atual no terminal e abra-o novamente (ou faça logoff do sistema) para que o novo grupo de permissões seja carregado com sucesso.
 
@@ -91,30 +89,29 @@ Siga rigorosamente as etapas estruturadas abaixo para clonar, configurar e rodar
 
 Baixe os arquivos fontes do projeto diretamente do GitHub para a sua máquina local:
 
-> Bash
-> git clone [https://github.com/dhuberto/theed.git](https://github.com/dhuberto/theed.git)
+
+> `git clone [https://github.com/dhuberto/theed.git](https://github.com/dhuberto/theed.git)`
 
 ### Passo 2: Acessar o Diretório do Projeto
 
 Navegue até a pasta raiz criada pelo Git:
 
-> Bash
-> cd theed
+
+> `cd theed`
 
 ### Passo 3: Configurar as Variáveis de Ambiente
 
 A aplicação necessita das variáveis de conexão do banco de dados para operar de forma segura. Copie o arquivo de exemplo para inicializar o arquivo de ambiente oficial:
 
-> Bash
-> cp .env.example .env
+> `cp .env.example .env`
 
 💡 **Dica de Customização:** Se desejar alterar o nome do banco de dados, o usuário ou as senhas administrativas padrões, abra o arquivo `.env` gerado utilizando o editor de texto de sua preferência (ex: `nano .env`) e altere os valores antes de subir os containers.
 
 ### Passo 4: Inicializar o Ecossistema de Containers
 
 Execute o comando de orquestração para construir a imagem customizada do Node.js, realizar o pull da imagem oficial do PostgreSQL e conectá-los na mesma rede virtual interna:
-> Bash
-> docker compose up -d
+
+> `docker compose up -d`
 
 -   **O que a flag `-d` (detached) faz?** Executa os containers em segundo plano, liberando o prompt do seu terminal imediatamente para que você possa continuar trabalhando.
     
@@ -140,19 +137,19 @@ Na interface do **Theed**, basta digitar um nome no campo do formulário e clica
     
 -   **Solução:** Aguarde cerca de 10 segundos e atualize a página no navegador (`F5`). Se o erro persistir, inspecione as saídas de logs do ecossistema executando:
 
-> Bash
-> docker compose logs -f
+
+> `docker compose logs -f`
 
 ## 🛑 Como Encerrar o Ambiente
 
 ### Desativar os Serviços (Mantendo os dados salvos)
 
 Para desligar e interromper a execução dos containers temporariamente sem perder os dados cadastrados, utilize:
-> Bash
-> docker compose down
+
+> `docker compose down`
 
 ### Reset Total do Ambiente (Apagando todos os registros)
 
 Caso necessite expurgar completamente o ambiente, removendo inclusive os volumes persistidos no disco e limpando todos os nomes inseridos no banco de dados, execute a remoção incluindo a flag de volumes:
->Bash
-> docker compose down -v
+
+> `docker compose down -v`
