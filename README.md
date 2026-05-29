@@ -1,6 +1,6 @@
 
 
-# 🌆 Theed – Cadastro de Nomes com Node.js & PostgreSQL (Docker)
+# Theed – Cadastro de Nomes com Node.js & PostgreSQL (Docker)
 
 ![Node.js](https://img.shields.io/badge/Node.js-v18-339933?logo=node.js&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v15-4169E1?logo=postgresql&logoColor=white)
@@ -11,7 +11,7 @@ O **Theed** é uma aplicação web monolítica simplificada, desenvolvida para d
 
 ---
 
-## 🎯 O que o projeto faz
+## O que o projeto faz
 
 * **Cadastro Simples:** Permite o envio de nomes através de um formulário web dinâmico.
 * **Renderização no Servidor (SSR):** Lista em tempo real os nomes salvos no banco de dados, ordenados pelos mais recentes.
@@ -19,7 +19,7 @@ O **Theed** é uma aplicação web monolítica simplificada, desenvolvida para d
 
 ---
 
-## 🏛️ Arquitetura do Sistema
+## Arquitetura do Sistema
 
 A aplicação adota o padrão de **Arquitetura Monolítica com Renderização no Servidor (Server-Side Rendering - SSR)**.
 
@@ -28,23 +28,23 @@ A aplicação adota o padrão de **Arquitetura Monolítica com Renderização no
 
 ---
 
-## 🛠️ Justificativas Técnicas de Infraestrutura (DevOps)
+## Justificativas Técnicas de Infraestrutura (DevOps)
 
 O projeto foi estruturado com foco em performance, portabilidade e segurança:
 
-### 🐳 Dockerfile (Build Otimizado)
+### Dockerfile (Build Otimizado)
 * **Imagem Base Alpine (`node:18-alpine`):** Reduz o tamanho final da imagem de ~1GB para cerca de **~180MB**, diminuindo o tempo de deploy e a superfície de ataque para vulnerabilidades.
 * **Multi-stage Build:** Divide o processo em duas etapas (`builder` e produção). As ferramentas de instalação e caches do NPM ficam isolados no primeiro estágio, gerando uma imagem final limpa e leve.
 * **Cache de Camadas:** A cópia dos arquivos `package*.json` é feita antes do código-fonte. Desse modo, se o código for alterado, o Docker aproveita o cache das dependências instaladas sem precisar baixar tudo do NPM novamente.
 
-### 🐙 Docker Compose (`compose.yml`)
+### Docker Compose (`compose.yml`)
 * **Isolamento de Credenciais:** O Compose consome variáveis de ambiente através de um arquivo `.env` local (não versionado), impedindo a exposição de senhas no GitHub.
 * **Persistência com Volumes:** Utiliza um volume nomeado (`postgres_data`) atrelado ao diretório `/var/lib/postgresql/data` do container, garantindo que os dados salvos persistam mesmo se o container for reiniciado ou destruído.
 * **Orquestração Inteligente (`depends_on`):** O serviço do app aguarda o banco de dados estar ativo antes de iniciar sua própria execução, evitando falhas de inicialização por perda de conectividade (`ECONNREFUSED`).
 
 ---
 
-## 📂 Estrutura do Projeto
+## Estrutura do Projeto
 ```text
 theed/
 ├── src/
@@ -58,7 +58,7 @@ theed/
 └── README.md             # Documentação oficial
 ```
 ----
-## 🚀 Pré-requisitos
+## Pré-requisitos
 
 Você precisará do Docker e do Docker Compose instalados.
 
@@ -76,7 +76,7 @@ Se não tiver o Docker instalado, execute os comandos abaixo no seu terminal:
 
 > `sudo usermod -aG docker $USER`
 
-⚠️ **Nota Importante:** Após rodar o comando `usermod`, encerre sua sessão atual no terminal e abra-o novamente (ou faça logoff do sistema) para que o novo grupo de permissões seja carregado com sucesso.
+**Nota Importante:** Após rodar o comando `usermod`, encerre sua sessão atual no terminal e abra-o novamente (ou faça logoff do sistema) para que o novo grupo de permissões seja carregado com sucesso.
 
 Para validar se as instalações foram concluídas com êxito, execute:
 ___
@@ -105,7 +105,7 @@ A aplicação necessita das variáveis de conexão do banco de dados para operar
 
 > `cp .env.example .env`
 
-💡 **Dica de Customização:** Se desejar alterar o nome do banco de dados, o usuário ou as senhas administrativas padrões, abra o arquivo `.env` gerado utilizando o editor de texto de sua preferência (ex: `nano .env`) e altere os valores antes de subir os containers.
+**Dica de Customização:** Se desejar alterar o nome do banco de dados, o usuário ou as senhas administrativas padrões, abra o arquivo `.env` gerado utilizando o editor de texto de sua preferência (ex: `nano .env`) e altere os valores antes de subir os containers.
 
 ### Passo 4: Inicializar o Ecossistema de Containers
 
@@ -116,7 +116,7 @@ Execute o comando de orquestração para construir a imagem customizada do Node.
 -   **O que a flag `-d` (detached) faz?** Executa os containers em segundo plano, liberando o prompt do seu terminal imediatamente para que você possa continuar trabalhando.
     
 
-## 🌍 Acesso à Aplicação
+## Acesso à Aplicação
 
 Assim que o processo do Docker Compose finalizar a inicialização de todos os serviços com sucesso, abra o navegador web e acesse o endereço abaixo:
 
@@ -140,7 +140,7 @@ Na interface do **Theed**, basta digitar um nome no campo do formulário e clica
 
 > `docker compose logs -f`
 
-## 🛑 Como Encerrar o Ambiente
+## Como Encerrar o Ambiente
 
 ### Desativar os Serviços (Mantendo os dados salvos)
 
