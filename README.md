@@ -81,7 +81,7 @@ Se não tiver o Docker instalado, execute os comandos abaixo no seu terminal:
 Para validar se as instalações foram concluídas com êxito, execute:
 ___
 
-## 🏁 Passo a Passo para Execução
+## Passo a Passo para Execução
 
 Siga rigorosamente as etapas estruturadas abaixo para clonar, configurar e rodar o projeto localmente:
 
@@ -122,7 +122,7 @@ Assim que o processo do Docker Compose finalizar a inicialização de todos os s
 
 Na interface do **Theed**, basta digitar um nome no campo do formulário e clicar em **Cadastrar**. As informações serão processadas pelo servidor Node.js e salvas na tabela do PostgreSQL instantaneamente, atualizando a listagem SSR abaixo.
 
-## 🛠️ Resolução de Problemas Comuns (Troubleshooting)
+## Resolução de Problemas Comuns (Troubleshooting)
 
 ### 1. Erro: `"Port 3000 (ou 5432) is already in use"`
 
