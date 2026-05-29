@@ -46,7 +46,7 @@ theed/
 
 └── src/
 
-└── index.js          # frontend + backend (formulário e API)	
+	└── index.js          # frontend + backend (formulário e API)	
 
 	
 ## Pré‑requisitos
