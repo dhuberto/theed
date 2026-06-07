@@ -90,7 +90,7 @@ Siga rigorosamente as etapas estruturadas abaixo para clonar, configurar e rodar
 Baixe os arquivos fontes do projeto diretamente do GitHub para a sua máquina local:
 
 
-> `git clone [https://github.com/dhuberto/theed.git](https://github.com/dhuberto/theed.git)`
+> `git clone https://github.com/dhuberto/theed.git`
 
 ### Passo 2: Acessar o Diretório do Projeto
 
