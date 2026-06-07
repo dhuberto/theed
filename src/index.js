@@ -1,4 +1,3 @@
-// src/index.js
 require('dotenv').config();
 const express = require('express');
 const { Sequelize, DataTypes } = require('sequelize');
@@ -13,7 +12,7 @@ const sequelize = new Sequelize({
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  logging: false, // Desabilita logs do SQL em produção
+  logging: false,
 });
 
 const Nome = sequelize.define('Nome', {
@@ -24,7 +23,9 @@ const Nome = sequelize.define('Nome', {
 });
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
+// Rota principal com listagem
 app.get('/', async (req, res) => {
   try {
     const nomes = await Nome.findAll({ order: [['createdAt', 'DESC']] });
@@ -58,18 +59,36 @@ app.post('/cadastrar', async (req, res) => {
   }
 });
 
-// Inicialização: Conecta ao banco e inicia o servidor
-(async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('✅ Conexão com o PostgreSQL estabelecida com sucesso!');
-    await sequelize.sync(); // Use sync() sem { alter: true } em produção
-    console.log('✅ Banco de dados sincronizado.');
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Servidor Theed rodando em http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error('❌ Falha na conexão com o banco:', error.message);
-    process.exit(1);
+// Função de retry para conexão com o banco
+const connectWithRetry = async () => {
+  const maxRetries = 0; // 0 = infinito (tenta para sempre)
+  let attempts = 0;
+
+  while (true) {
+    attempts++;
+    console.log(`Tentativa ${attempts} de conexão com o banco...`);
+
+    try {
+      await sequelize.authenticate();
+      console.log('✅ Conexão com o PostgreSQL estabelecida com sucesso!');
+      await sequelize.sync(); // Cria a tabela se não existir
+      console.log('✅ Banco de dados sincronizado.');
+
+      // Inicia o servidor apenas após a conexão bem-sucedida
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`🚀 Servidor Theed rodando em http://localhost:${PORT}`);
+      });
+      return; // Sai do loop quando conectar
+    } catch (error) {
+      console.error(`❌ Falha na conexão (tentativa ${attempts}): ${error.message}`);
+      if (maxRetries > 0 && attempts >= maxRetries) {
+        console.error('Número máximo de tentativas atingido. Encerrando a aplicação.');
+        process.exit(1);
+      }
+      console.log('Aguardando 5 segundos antes da próxima tentativa...');
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
   }
-})();
+};
+
+connectWithRetry();
