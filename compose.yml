@@ -36,7 +36,6 @@ services:
       - PORT=3000
     ports:
       - "3000:3000"
-    # O volume - .:/app foi REMOVIDO para produção
 
 volumes:
   postgres_data:
