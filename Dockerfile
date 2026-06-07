@@ -1,4 +1,24 @@
-# Usa a imagem base oficial do Node.js na versão LTS (Alpine para tamanho reduzido)
+FROM node:18-alpine
+
+ENV NODE_ENV=production
+WORKDIR /app
+
+COPY package*.json ./
+
+# Troque npm ci por npm install (sem lockfile)
+RUN npm install --only=production --no-audit --no-fund && \
+    npm cache clean --force && \
+    rm -rf /usr/local/lib/node_modules/npm
+
+COPY src ./src
+
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+USER nodejs
+
+EXPOSE 3000
+CMD ["node", "src/index.js"]# Usa a imagem base oficial do Node.js na versão LTS (Alpine para tamanho reduzido)
 FROM node:18-alpine
 
 # Define o ambiente como produção
