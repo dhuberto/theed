@@ -1,13 +1,26 @@
-# Estágio builder – instala dependências (incluindo ferramentas, se houvesse)
-FROM node:18-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm install --only=production && npm cache clean --force
-
-# Estágio final – imagem de produção
 FROM node:18-alpine
+
+# Define ambiente de produção (desabilita logs de dev, otimiza)
+ENV NODE_ENV=production
+
 WORKDIR /app
-COPY --from=builder /app/node_modules ./node_modules
-COPY . .
+
+# Copia APENAS os arquivos de manifesto (aproveita cache do Docker)
+COPY package*.json ./
+
+# Instala dependências de produção de forma exata, rápida e sem cache desnecessário
+RUN npm ci --only=production --no-audit --no-fund && \
+    npm cache clean --force
+
+# Copia o restante do código (somente o necessário)
+COPY src ./src
+
+# Cria um usuário não-root para segurança
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /app
+USER nodejs
+
 EXPOSE 3000
+
 CMD ["node", "src/index.js"]
