@@ -1,39 +1,75 @@
-// ... (outras declarações require e app.use)
+// src/index.js
+require('dotenv').config();
+const express = require('express');
+const { Sequelize, DataTypes } = require('sequelize');
 
-const sequelize = new Sequelize(/* ... */);
-const Nome = sequelize.define(/* ... */);
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Função para tentar a conexão com o banco repetidas vezes
-const connectWithRetry = async () => {
-  const maxRetries = 10;
-  const retryInterval = 5000; // 5 segundos
-  let attempts = 0;
+const sequelize = new Sequelize({
+  dialect: 'postgres',
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  logging: false, // Desabilita logs do SQL em produção
+});
 
-  while (attempts < maxRetries) {
-    attempts++;
-    console.log(`Tentativa ${attempts} de conexão com o banco de dados...`);
-    try {
-      await sequelize.authenticate();
-      console.log('✅ Conexão com o PostgreSQL estabelecida com sucesso!');
-      await sequelize.sync({ alter: true });
-      console.log('✅ Banco de dados sincronizado.');
-      
-      // Inicia o servidor apenas após a conexão bem-sucedida
-      app.listen(3000, () => {
-        console.log('🚀 Servidor Theed rodando em http://localhost:3000');
-      });
-      return; // Sai do loop se a conexão for bem-sucedida
-    } catch (error) {
-      console.error(`❌ Falha na conexão (tentativa ${attempts}/${maxRetries}): ${error.message}`);
-      if (attempts === maxRetries) {
-        console.error('Número máximo de tentativas atingido. Encerrando a aplicação.');
-        process.exit(1);
-      }
-      console.log(`Aguardando ${retryInterval/1000} segundos antes da próxima tentativa...`);
-      await new Promise(resolve => setTimeout(resolve, retryInterval));
-    }
+const Nome = sequelize.define('Nome', {
+  nome: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+});
+
+app.use(express.urlencoded({ extended: true }));
+
+app.get('/', async (req, res) => {
+  try {
+    const nomes = await Nome.findAll({ order: [['createdAt', 'DESC']] });
+    const lista = nomes.map(n => `<li>${n.nome}</li>`).join('');
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>Theed - Cadastro de Nomes</title><meta charset="utf-8"></head>
+      <body>
+        <h1>Theed - Cadastro de Nomes</h1>
+        <form action="/cadastrar" method="post">
+          <input type="text" name="nome" placeholder="Digite um nome" required>
+          <button type="submit">Cadastrar</button>
+        </form>
+        <h2>Nomes cadastrados:</h2>
+        <ul>${lista || '<li>Nenhum nome ainda</li>'}</ul>
+      </body>
+      </html>
+    `);
+  } catch (err) {
+    res.status(500).send('Erro ao listar nomes');
   }
-};
+});
 
-// Inicia o processo de conexão
-connectWithRetry();
+app.post('/cadastrar', async (req, res) => {
+  try {
+    await Nome.create({ nome: req.body.nome });
+    res.redirect('/');
+  } catch (err) {
+    res.status(500).send('Erro ao cadastrar nome');
+  }
+});
+
+// Inicialização: Conecta ao banco e inicia o servidor
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('✅ Conexão com o PostgreSQL estabelecida com sucesso!');
+    await sequelize.sync(); // Use sync() sem { alter: true } em produção
+    console.log('✅ Banco de dados sincronizado.');
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Servidor Theed rodando em http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error('❌ Falha na conexão com o banco:', error.message);
+    process.exit(1);
+  }
+})();
