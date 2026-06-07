@@ -1,2 +1,13 @@
-.env
 node_modules
+.git
+.env
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+compose.yml
+*.log
+.nyc_output
+coverage
+.idea
+.vscode
