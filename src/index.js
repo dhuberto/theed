@@ -21,6 +21,7 @@ const Nome = sequelize.define('Nome', {
 
 app.use(express.urlencoded({ extended: true }));
 
+// Status do banco para o middleware
 app.use(async (req, res, next) => {
   try {
     await sequelize.authenticate();
@@ -31,6 +32,7 @@ app.use(async (req, res, next) => {
   next();
 });
 
+// Rota principal
 app.get('/', async (req, res) => {
   let nomes = [];
   let dbStatus = res.locals.dbStatus;
@@ -46,13 +48,13 @@ app.get('/', async (req, res) => {
     error = 'Banco de dados indisponível no momento.';
   }
 
+  // Lista com botão excluir individual (SEM checkbox e SEM exclusão múltipla)
   let listaHtml = '';
   if (nomes.length > 0) {
     listaHtml = '<ul>';
     for (const n of nomes) {
       listaHtml += `
         <li>
-          <input type="checkbox" name="ids" value="${n.id}">
           <span>${escapeHtml(n.nome)}</span>
           <form action="/excluir/${n.id}" method="post" style="display: inline;">
             <button type="submit" class="delete-single">🗑️ Excluir</button>
@@ -83,15 +85,12 @@ app.get('/', async (req, res) => {
         .offline { background: #fed7d7; color: #9b2c2c; }
         input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; }
         button { background: #2c7da0; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
-        button.danger { background: #c53030; }
         button.delete-single { background: #e53e3e; padding: 5px 10px; font-size: 12px; margin-left: 10px; }
         ul { list-style: none; padding: 0; }
-        li { background: #f0f2f5; margin: 8px 0; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 12px; }
-        li input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
+        li { background: #f0f2f5; margin: 8px 0; padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
         li span { flex: 1; }
         .error { background: #fed7d7; color: #9b2c2c; padding: 10px; border-radius: 8px; margin-top: 16px; }
         footer { text-align: center; margin-top: 24px; font-size: 12px; color: #777; }
-        .button-group { margin-top: 16px; }
       </style>
     </head>
     <body>
@@ -104,19 +103,15 @@ app.get('/', async (req, res) => {
         </form>
         <h2>📋 Últimos nomes cadastrados</h2>
         ${errorHtml}
-        <form action="/excluir" method="post">
-          ${listaHtml}
-          <div class="button-group">
-            <button type="submit" class="danger" ${nomes.length === 0 ? 'disabled' : ''}>🗑️ Excluir selecionados</button>
-          </div>
-        </form>
-        <footer>Theed - Cadastro de Nomes com Node.js, PostgreSQL e Docker</footer>
+        ${listaHtml}
+        <footer>Theed - Node.js + PostgreSQL + Docker</footer>
       </div>
     </body>
     </html>
   `);
 });
 
+// Rota para cadastrar
 app.post('/cadastrar', async (req, res) => {
   const nome = req.body.nome;
   if (!nome || nome.trim() === '') return res.redirect('/');
@@ -128,22 +123,11 @@ app.post('/cadastrar', async (req, res) => {
   }
 });
 
+// Rota para excluir individualmente
 app.post('/excluir/:id', async (req, res) => {
   const id = req.params.id;
   try {
     await Nome.destroy({ where: { id } });
-    res.redirect('/');
-  } catch (err) {
-    res.status(500).send('Erro ao excluir.');
-  }
-});
-
-app.post('/excluir', async (req, res) => {
-  let ids = req.body.ids;
-  if (!ids) return res.redirect('/');
-  if (!Array.isArray(ids)) ids = [ids];
-  try {
-    await Nome.destroy({ where: { id: ids } });
     res.redirect('/');
   } catch (err) {
     res.status(500).send('Erro ao excluir.');
@@ -160,6 +144,7 @@ function escapeHtml(str) {
   });
 }
 
+// Inicialização com retry
 (async function connect() {
   let attempts = 0;
   while (true) {
