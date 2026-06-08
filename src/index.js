@@ -51,13 +51,13 @@ app.get('/', async (req, res) => {
     error = 'Banco de dados indisponível no momento.';
   }
 
-  // Lista com checkbox e botão de excluir individual
+  // CORREÇÃO AQUI: agora cada nome tem checkbox + botão excluir individual
   const listaHtml = nomes.map(n => `
     <li>
       <input type="checkbox" name="ids" value="${n.id}">
       <span>${escapeHtml(n.nome)}</span>
-      <form action="/excluir/${n.id}" method="post" style="margin:0;">
-        <button type="submit" class="delete-single">🗑️</button>
+      <form action="/excluir/${n.id}" method="post" style="display: inline;">
+        <button type="submit" class="delete-single">🗑️ Excluir</button>
       </form>
     </li>
   `).join('');
@@ -71,6 +71,7 @@ app.get('/', async (req, res) => {
       <meta charset="UTF-8">
       <title>Theed - Cadastro de Nomes</title>
       <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
           font-family: Arial, sans-serif;
           max-width: 600px;
@@ -92,14 +93,8 @@ app.get('/', async (req, res) => {
           font-weight: bold;
           margin-bottom: 20px;
         }
-        .online {
-          background: #c6f7d0;
-          color: #0e5e2e;
-        }
-        .offline {
-          background: #fed7d7;
-          color: #9b2c2c;
-        }
+        .online { background: #c6f7d0; color: #0e5e2e; }
+        .offline { background: #fed7d7; color: #9b2c2c; }
         input[type="text"] {
           width: 100%;
           padding: 10px;
@@ -114,21 +109,15 @@ app.get('/', async (req, res) => {
           padding: 10px;
           border-radius: 8px;
           cursor: pointer;
-          margin-top: 8px;
         }
-        button.danger {
-          background: #c53030;
-        }
+        button.danger { background: #c53030; }
         button.delete-single {
           background: #e53e3e;
-          padding: 6px 10px;
-          font-size: 14px;
-          margin: 0;
+          padding: 5px 10px;
+          font-size: 12px;
+          margin-left: 10px;
         }
-        ul {
-          list-style: none;
-          padding: 0;
-        }
+        ul { list-style: none; padding: 0; }
         li {
           background: #f0f2f5;
           margin: 8px 0;
@@ -138,14 +127,8 @@ app.get('/', async (req, res) => {
           align-items: center;
           gap: 12px;
         }
-        li input[type="checkbox"] {
-          width: 20px;
-          height: 20px;
-          margin: 0;
-        }
-        li span {
-          flex: 1;
-        }
+        li input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
+        li span { flex: 1; }
         .error {
           background: #fed7d7;
           color: #9b2c2c;
@@ -206,7 +189,7 @@ app.post('/cadastrar', async (req, res) => {
   }
 });
 
-// Rota para excluir um único nome (via botão individual)
+// NOVA ROTA: excluir um único nome (via botão individual)
 app.post('/excluir/:id', async (req, res) => {
   const id = req.params.id;
   try {
@@ -227,7 +210,7 @@ app.post('/excluir', async (req, res) => {
     await Nome.destroy({ where: { id: ids } });
     res.redirect('/');
   } catch (err) {
-    console.error('Erro ao excluir múltiplos:', err.message);
+    console.error('Erro ao excluir:', err.message);
     res.status(500).send('Erro ao excluir nomes.');
   }
 });
