@@ -51,10 +51,14 @@ app.get('/', async (req, res) => {
     error = 'Banco de dados indisponível no momento.';
   }
 
+  // Lista com checkbox e botão de excluir individual
   const listaHtml = nomes.map(n => `
     <li>
       <input type="checkbox" name="ids" value="${n.id}">
       <span>${escapeHtml(n.nome)}</span>
+      <form action="/excluir/${n.id}" method="post" style="margin:0;">
+        <button type="submit" class="delete-single">🗑️</button>
+      </form>
     </li>
   `).join('');
 
@@ -114,6 +118,12 @@ app.get('/', async (req, res) => {
         }
         button.danger {
           background: #c53030;
+        }
+        button.delete-single {
+          background: #e53e3e;
+          padding: 6px 10px;
+          font-size: 14px;
+          margin: 0;
         }
         ul {
           list-style: none;
@@ -196,19 +206,28 @@ app.post('/cadastrar', async (req, res) => {
   }
 });
 
-// Rota para excluir múltiplos nomes
+// Rota para excluir um único nome (via botão individual)
+app.post('/excluir/:id', async (req, res) => {
+  const id = req.params.id;
+  try {
+    await Nome.destroy({ where: { id } });
+    res.redirect('/');
+  } catch (err) {
+    console.error('Erro ao excluir:', err.message);
+    res.status(500).send('Erro ao excluir nome.');
+  }
+});
+
+// Rota para excluir múltiplos nomes (selecionados via checkbox)
 app.post('/excluir', async (req, res) => {
   let ids = req.body.ids;
   if (!ids) return res.redirect('/');
-
-  // Se apenas um ID for enviado (não é array), transforma em array
   if (!Array.isArray(ids)) ids = [ids];
-
   try {
     await Nome.destroy({ where: { id: ids } });
     res.redirect('/');
   } catch (err) {
-    console.error('Erro ao excluir:', err.message);
+    console.error('Erro ao excluir múltiplos:', err.message);
     res.status(500).send('Erro ao excluir nomes.');
   }
 });
