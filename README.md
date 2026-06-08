@@ -156,6 +156,9 @@ Caso necessite expurgar completamente o ambiente, removendo inclusive os volumes
 > 
 > `docker compose up -d --build` #(caso queira recriar atualizando)
 
+### Verifica Logs
+>`docker compose logs app --tail=20`
+
 ### Removendo o Projeto.
 
 > `docker compose down -v` #(-v remove volumes)
@@ -167,6 +170,3 @@ Caso necessite expurgar completamente o ambiente, removendo inclusive os volumes
 > `cd ..`
 > 
 > `rm -rf theed`
-
-## Verifica Logs
->`docker compose logs app --tail=20`
