@@ -21,34 +21,20 @@ const Nome = sequelize.define('Nome', {
 
 app.use(express.urlencoded({ extended: true }));
 
-// Status do banco para o middleware
-app.use(async (req, res, next) => {
-  try {
-    await sequelize.authenticate();
-    res.locals.dbStatus = 'online';
-  } catch (err) {
-    res.locals.dbStatus = 'offline';
-  }
-  next();
-});
-
-// Rota principal
 app.get('/', async (req, res) => {
   let nomes = [];
-  let dbStatus = res.locals.dbStatus;
+  let dbStatus = 'offline';
   let error = null;
 
-  if (dbStatus === 'online') {
-    try {
-      nomes = await Nome.findAll({ order: [['createdAt', 'DESC']] });
-    } catch (err) {
-      error = 'Erro ao carregar nomes.';
-    }
-  } else {
-    error = 'Banco de dados indisponível no momento.';
+  try {
+    await sequelize.authenticate();
+    dbStatus = 'online';
+    nomes = await Nome.findAll({ order: [['createdAt', 'DESC']] });
+  } catch (err) {
+    error = 'Banco de dados indisponível.';
   }
 
-  // Lista com botão excluir individual (SEM checkbox e SEM exclusão múltipla)
+  // Monta a lista APENAS com nome + botão excluir (sem checkbox, sem form inferior)
   let listaHtml = '';
   if (nomes.length > 0) {
     listaHtml = '<ul>';
@@ -56,9 +42,7 @@ app.get('/', async (req, res) => {
       listaHtml += `
         <li>
           <span>${escapeHtml(n.nome)}</span>
-          <form action="/excluir/${n.id}" method="post" style="display: inline;">
-            <button type="submit" class="delete-single">🗑️ Excluir</button>
-          </form>
+          <a href="/excluir/${n.id}" class="delete-btn" onclick="return confirm('Remover ${escapeHtml(n.nome)}?')">🗑️ Excluir</a>
         </li>
       `;
     }
@@ -67,9 +51,9 @@ app.get('/', async (req, res) => {
     listaHtml = '<p>Nenhum nome cadastrado ainda.</p>';
   }
 
-  const errorHtml = error ? `<div class="error">⚠️ ${escapeHtml(error)}</div>` : '';
   const statusClass = dbStatus === 'online' ? 'online' : 'offline';
   const statusText = dbStatus === 'online' ? 'ONLINE' : 'OFFLINE';
+  const errorHtml = error ? `<div class="error">⚠️ ${error}</div>` : '';
 
   res.send(`
     <!DOCTYPE html>
@@ -85,10 +69,9 @@ app.get('/', async (req, res) => {
         .offline { background: #fed7d7; color: #9b2c2c; }
         input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; }
         button { background: #2c7da0; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
-        button.delete-single { background: #e53e3e; padding: 5px 10px; font-size: 12px; margin-left: 10px; }
         ul { list-style: none; padding: 0; }
-        li { background: #f0f2f5; margin: 8px 0; padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-        li span { flex: 1; }
+        li { background: #f0f2f5; margin: 8px 0; padding: 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; }
+        .delete-btn { background: #e53e3e; color: white; text-decoration: none; padding: 5px 10px; border-radius: 6px; font-size: 12px; }
         .error { background: #fed7d7; color: #9b2c2c; padding: 10px; border-radius: 8px; margin-top: 16px; }
         footer { text-align: center; margin-top: 24px; font-size: 12px; color: #777; }
       </style>
@@ -111,7 +94,7 @@ app.get('/', async (req, res) => {
   `);
 });
 
-// Rota para cadastrar
+// Cadastrar
 app.post('/cadastrar', async (req, res) => {
   const nome = req.body.nome;
   if (!nome || nome.trim() === '') return res.redirect('/');
@@ -123,8 +106,8 @@ app.post('/cadastrar', async (req, res) => {
   }
 });
 
-// Rota para excluir individualmente
-app.post('/excluir/:id', async (req, res) => {
+// Excluir via GET (mais simples, sem formulário POST)
+app.get('/excluir/:id', async (req, res) => {
   const id = req.params.id;
   try {
     await Nome.destroy({ where: { id } });
@@ -144,7 +127,7 @@ function escapeHtml(str) {
   });
 }
 
-// Inicialização com retry
+// Inicialização
 (async function connect() {
   let attempts = 0;
   while (true) {
