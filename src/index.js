@@ -5,7 +5,6 @@ const { Sequelize, DataTypes } = require('sequelize');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuração do banco
 const sequelize = new Sequelize({
   dialect: 'postgres',
   host: process.env.DB_HOST,
@@ -16,15 +15,13 @@ const sequelize = new Sequelize({
   logging: false,
 });
 
-// Modelo Nome
 const Nome = sequelize.define('Nome', {
   nome: { type: DataTypes.STRING, allowNull: false },
 });
 
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
 
-// Middleware para verificar status do banco
+// Middleware para status do banco
 app.use(async (req, res, next) => {
   try {
     await sequelize.authenticate();
@@ -51,125 +48,73 @@ app.get('/', async (req, res) => {
     error = 'Banco de dados indisponível no momento.';
   }
 
-  // CORREÇÃO AQUI: agora cada nome tem checkbox + botão excluir individual
-  const listaHtml = nomes.map(n => `
-    <li>
-      <input type="checkbox" name="ids" value="${n.id}">
-      <span>${escapeHtml(n.nome)}</span>
-      <form action="/excluir/${n.id}" method="post" style="display: inline;">
-        <button type="submit" class="delete-single">🗑️ Excluir</button>
-      </form>
-    </li>
-  `).join('');
+  // Gera a lista de nomes com checkbox e botão de excluir
+  let listaHtml = '';
+  if (nomes.length > 0) {
+    listaHtml = '<ul>';
+    for (const n of nomes) {
+      listaHtml += `
+        <li>
+          <input type="checkbox" name="ids" value="${n.id}">
+          <span>${escapeHtml(n.nome)}</span>
+          <form action="/excluir/${n.id}" method="post" style="display: inline;">
+            <button type="submit" class="delete-single">🗑️ Excluir</button>
+          </form>
+        </li>
+      `;
+    }
+    listaHtml += '</ul>';
+  } else {
+    listaHtml = '<p>Nenhum nome cadastrado ainda.</p>';
+  }
 
   const errorHtml = error ? `<div class="error">⚠️ ${escapeHtml(error)}</div>` : '';
+  const statusClass = dbStatus === 'online' ? 'online' : 'offline';
+  const statusText = dbStatus === 'online' ? 'ONLINE' : 'OFFLINE';
 
   res.send(`
     <!DOCTYPE html>
-    <html lang="pt-BR">
+    <html>
     <head>
       <meta charset="UTF-8">
       <title>Theed - Cadastro de Nomes</title>
       <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-          font-family: Arial, sans-serif;
-          max-width: 600px;
-          margin: 40px auto;
-          padding: 20px;
-          background: #f5f5f5;
-        }
-        .card {
-          background: white;
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .status {
-          display: inline-block;
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 14px;
-          font-weight: bold;
-          margin-bottom: 20px;
-        }
+        body { font-family: Arial; max-width: 600px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+        .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .status { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; margin-bottom: 20px; }
         .online { background: #c6f7d0; color: #0e5e2e; }
         .offline { background: #fed7d7; color: #9b2c2c; }
-        input[type="text"] {
-          width: 100%;
-          padding: 10px;
-          margin: 8px 0;
-          border-radius: 8px;
-          border: 1px solid #ccc;
-        }
-        button {
-          background: #2c7da0;
-          color: white;
-          border: none;
-          padding: 10px;
-          border-radius: 8px;
-          cursor: pointer;
-        }
+        input[type="text"] { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; }
+        button { background: #2c7da0; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; }
         button.danger { background: #c53030; }
-        button.delete-single {
-          background: #e53e3e;
-          padding: 5px 10px;
-          font-size: 12px;
-          margin-left: 10px;
-        }
+        button.delete-single { background: #e53e3e; padding: 5px 10px; font-size: 12px; margin-left: 10px; }
         ul { list-style: none; padding: 0; }
-        li {
-          background: #f0f2f5;
-          margin: 8px 0;
-          padding: 10px;
-          border-radius: 8px;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
+        li { background: #f0f2f5; margin: 8px 0; padding: 10px; border-radius: 8px; display: flex; align-items: center; gap: 12px; }
         li input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
         li span { flex: 1; }
-        .error {
-          background: #fed7d7;
-          color: #9b2c2c;
-          padding: 10px;
-          border-radius: 8px;
-          margin-top: 16px;
-        }
-        footer {
-          text-align: center;
-          margin-top: 24px;
-          font-size: 12px;
-          color: #777;
-        }
-        .button-group {
-          display: flex;
-          gap: 8px;
-          margin-top: 16px;
-        }
+        .error { background: #fed7d7; color: #9b2c2c; padding: 10px; border-radius: 8px; margin-top: 16px; }
+        footer { text-align: center; margin-top: 24px; font-size: 12px; color: #777; }
+        .button-group { margin-top: 16px; }
       </style>
     </head>
     <body>
       <div class="card">
         <h1>📝 Theed - Cadastro de Nomes</h1>
-        <div class="status ${dbStatus === 'online' ? 'online' : 'offline'}">
-          💾 Banco ${dbStatus === 'online' ? 'ONLINE' : 'OFFLINE'}
-        </div>
+        <div class="status ${statusClass}">💾 Banco ${statusText}</div>
 
         <form action="/cadastrar" method="post">
           <input type="text" name="nome" placeholder="Digite um nome" required>
           <button type="submit">Cadastrar</button>
         </form>
 
-        <h2>📋 Nomes cadastrados</h2>
+        <h2>📋 Últimos nomes cadastrados</h2>
         ${errorHtml}
-        <form action="/excluir" method="post" id="deleteForm">
-          ${listaHtml ? `<ul>${listaHtml}</ul>` : '<p>Nenhum nome ainda.</p>'}
+        <form action="/excluir" method="post">
+          ${listaHtml}
           <div class="button-group">
-            <button type="submit" class="danger" ${!listaHtml ? 'disabled' : ''}>🗑️ Excluir selecionados</button>
+            <button type="submit" class="danger" ${nomes.length === 0 ? 'disabled' : ''}>🗑️ Excluir selecionados</button>
           </div>
         </form>
-
         <footer>Theed - Node.js + PostgreSQL + Docker</footer>
       </div>
     </body>
@@ -177,7 +122,7 @@ app.get('/', async (req, res) => {
   `);
 });
 
-// Rota para cadastrar
+// Cadastrar
 app.post('/cadastrar', async (req, res) => {
   const nome = req.body.nome;
   if (!nome || nome.trim() === '') return res.redirect('/');
@@ -185,23 +130,22 @@ app.post('/cadastrar', async (req, res) => {
     await Nome.create({ nome: nome.trim() });
     res.redirect('/');
   } catch (err) {
-    res.status(500).send('Erro ao cadastrar. Tente novamente.');
+    res.status(500).send('Erro ao cadastrar.');
   }
 });
 
-// NOVA ROTA: excluir um único nome (via botão individual)
+// Excluir individual
 app.post('/excluir/:id', async (req, res) => {
   const id = req.params.id;
   try {
     await Nome.destroy({ where: { id } });
     res.redirect('/');
   } catch (err) {
-    console.error('Erro ao excluir:', err.message);
-    res.status(500).send('Erro ao excluir nome.');
+    res.status(500).send('Erro ao excluir.');
   }
 });
 
-// Rota para excluir múltiplos nomes (selecionados via checkbox)
+// Excluir múltiplos
 app.post('/excluir', async (req, res) => {
   let ids = req.body.ids;
   if (!ids) return res.redirect('/');
@@ -210,8 +154,7 @@ app.post('/excluir', async (req, res) => {
     await Nome.destroy({ where: { id: ids } });
     res.redirect('/');
   } catch (err) {
-    console.error('Erro ao excluir:', err.message);
-    res.status(500).send('Erro ao excluir nomes.');
+    res.status(500).send('Erro ao excluir.');
   }
 });
 
@@ -225,26 +168,24 @@ function escapeHtml(str) {
   });
 }
 
-// Retry infinito na inicialização
-async function connectWithRetry() {
+// Inicialização com retry
+(async function connect() {
   let attempts = 0;
   while (true) {
     attempts++;
-    console.log(`Tentativa ${attempts} de conexão com o banco...`);
+    console.log(`Tentativa ${attempts} de conexão...`);
     try {
       await sequelize.authenticate();
-      console.log('✅ Conectado ao PostgreSQL!');
+      console.log('✅ Conectado ao PostgreSQL');
       await sequelize.sync();
-      console.log('✅ Tabelas sincronizadas.');
+      console.log('✅ Tabelas sincronizadas');
       app.listen(PORT, '0.0.0.0', () => {
-        console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+        console.log(`🚀 Servidor em http://localhost:${PORT}`);
       });
       break;
     } catch (err) {
-      console.error(`❌ Falha (tentativa ${attempts}): ${err.message}`);
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      console.log(`Aguardando banco... (${err.message})`);
+      await new Promise(r => setTimeout(r, 5000));
     }
   }
-}
-
-connectWithRetry();
+})();
