@@ -21,7 +21,6 @@ const Nome = sequelize.define('Nome', {
 
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware para status do banco
 app.use(async (req, res, next) => {
   try {
     await sequelize.authenticate();
@@ -32,7 +31,6 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Rota principal
 app.get('/', async (req, res) => {
   let nomes = [];
   let dbStatus = res.locals.dbStatus;
@@ -48,7 +46,6 @@ app.get('/', async (req, res) => {
     error = 'Banco de dados indisponível no momento.';
   }
 
-  // Gera a lista de nomes com checkbox e botão de excluir
   let listaHtml = '';
   if (nomes.length > 0) {
     listaHtml = '<ul>';
@@ -101,12 +98,10 @@ app.get('/', async (req, res) => {
       <div class="card">
         <h1>📝 Theed - Cadastro de Nomes</h1>
         <div class="status ${statusClass}">💾 Banco ${statusText}</div>
-
         <form action="/cadastrar" method="post">
           <input type="text" name="nome" placeholder="Digite um nome" required>
           <button type="submit">Cadastrar</button>
         </form>
-
         <h2>📋 Últimos nomes cadastrados</h2>
         ${errorHtml}
         <form action="/excluir" method="post">
@@ -115,14 +110,13 @@ app.get('/', async (req, res) => {
             <button type="submit" class="danger" ${nomes.length === 0 ? 'disabled' : ''}>🗑️ Excluir selecionados</button>
           </div>
         </form>
-        <footer>Theed - Node.js + PostgreSQL + Docker</footer>
+        <footer>Theed - Cadastro de Nomes com Node.js, PostgreSQL e Docker</footer>
       </div>
     </body>
     </html>
   `);
 });
 
-// Cadastrar
 app.post('/cadastrar', async (req, res) => {
   const nome = req.body.nome;
   if (!nome || nome.trim() === '') return res.redirect('/');
@@ -134,7 +128,6 @@ app.post('/cadastrar', async (req, res) => {
   }
 });
 
-// Excluir individual
 app.post('/excluir/:id', async (req, res) => {
   const id = req.params.id;
   try {
@@ -145,7 +138,6 @@ app.post('/excluir/:id', async (req, res) => {
   }
 });
 
-// Excluir múltiplos
 app.post('/excluir', async (req, res) => {
   let ids = req.body.ids;
   if (!ids) return res.redirect('/');
@@ -168,7 +160,6 @@ function escapeHtml(str) {
   });
 }
 
-// Inicialização com retry
 (async function connect() {
   let attempts = 0;
   while (true) {
