@@ -150,14 +150,16 @@ Para desligar e interromper a execução dos containers temporariamente sem perd
 
 ### Reset Total do Ambiente (Apagando todos os registros)
 
-Caso necessite expurgar completamente o ambiente, removendo inclusive os volumes persistidos no disco e limpando todos os nomes inseridos no banco de dados, execute a remoção incluindo a flag de volumes:
+Caso necessite expurgar completamente o ambiente, removendo inclusive os volumes persistidos no disco e limpando todos os nomes inseridos no banco de dados, execute a remoção incluindo a flag de volumes e recriar novamente:
 
 > `docker compose down -v` #(-v remove volumes)
 > 
-> `docker compose up -d --build` #(caso queira atualizar)
+> `docker compose up -d --build` #(caso queira recriar atualizando)
 
 ### Removendo o Projeto.
 
+> `docker compose down -v` #(-v remove volumes)
+> 
 > `docker rmi theed-app`
 > 
 > `docker rmi postgres:15-alpine`
