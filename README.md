@@ -166,5 +166,5 @@ Caso necessite expurgar completamente o ambiente, removendo inclusive os volumes
 > 
 > `rm -rf theed`
 
-## Verificar Logs
+## Verifica Logs
 >`docker compose logs app --tail=20`
